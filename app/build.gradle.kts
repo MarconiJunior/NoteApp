@@ -47,7 +47,7 @@ android {
     }
     kotlin {
         jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(22))
         }
     }
     composeCompiler {
@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.compose.ui:ui:${composeVersion}")
+    implementation("androidx.compose.material3:material3:1.3.1")
     implementation("androidx.compose.material:material:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -92,8 +93,8 @@ dependencies {
 
     // Dagger - Hilt
 
-    implementation("com.google.dagger:hilt-android:2.49")
-    ksp("com.google.dagger:hilt-android-compiler:2.49")
+    implementation("com.google.dagger:hilt-android:2.55")
+    ksp("com.google.dagger:hilt-android-compiler:2.55")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
 
     // Room
