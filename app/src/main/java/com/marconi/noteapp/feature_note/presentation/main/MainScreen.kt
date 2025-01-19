@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -91,13 +92,12 @@ fun MainScreen(
         }
     }
 
-    LaunchedEffect(currentRoute) {
-        Log.d("sadas","${currentRoute.value?.destination?.route}")
-    }
-
-
     NoteAppTheme(
-        darkTheme =  inDarkMode ?: isSystemInDarkTheme()
+        darkTheme = when (inDarkMode) {
+            true -> true
+            false -> false
+            null -> isSystemInDarkTheme()
+        }
     ) {
         Surface(
             color = MaterialTheme.colorScheme.surface
@@ -145,10 +145,15 @@ fun MainScreen(
                                             imageVector = Icons.Default.DarkMode,
                                             contentDescription = "Dark Mode"
                                         )
-                                    } else {
+                                    } else if (isDark == false) {
                                         Icon(
                                             imageVector = Icons.Default.LightMode,
                                             contentDescription = "Light Mode"
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.Settings,
+                                            contentDescription = "System default"
                                         )
                                     }
                                 }

@@ -1,6 +1,7 @@
 package com.marconi.noteapp.di
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
 import com.marconi.noteapp.events.CommonEvents
 import com.marconi.noteapp.feature_note.data.data_source.NoteDao
@@ -12,9 +13,11 @@ import com.marconi.noteapp.feature_note.domain.use_case.AddNote
 import com.marconi.noteapp.feature_note.domain.use_case.GetNote
 import com.marconi.noteapp.feature_note.domain.use_case.GetNotes
 import com.marconi.noteapp.feature_note.domain.use_case.NoteUseCases
+import com.marconi.noteapp.feature_note.presentation.util.ThemeManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -52,4 +55,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCommonEvents(): CommonEvents = CommonEvents()
+
+    @Provides
+    @Singleton
+    fun provideThemeManager(
+        @ApplicationContext context: Context
+    ) = ThemeManager(context)
 }
