@@ -2,12 +2,16 @@ package com.marconi.noteapp.feature_note.presentation.notes
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.marconi.noteapp.feature_note.domain.model.Note
 import com.marconi.noteapp.feature_note.domain.use_case.NoteUseCases
 import com.marconi.noteapp.feature_note.domain.util.NoteOrder
 import com.marconi.noteapp.feature_note.domain.util.OrderType
+import com.marconi.noteapp.snackbar_utils.SnackbarAction
+import com.marconi.noteapp.snackbar_utils.SnackbarController
+import com.marconi.noteapp.snackbar_utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -19,9 +23,14 @@ import javax.inject.Inject
 class NotesViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases
 ) : ViewModel() {
-
     private val _state = mutableStateOf(NotesState())
     val state: State<NotesState> = _state
+
+    private val _showDialog = MutableLiveData(false)
+    val showDialog: MutableLiveData<Boolean> = _showDialog
+
+    private val _currentSelectedNote = MutableLiveData<Note?>(null)
+    val currentSelectedNote: MutableLiveData<Note?> = _currentSelectedNote
 
     private var recentlyDeletedNote: Note? = null
 
@@ -72,5 +81,32 @@ class NotesViewModel @Inject constructor(
                 )
             }
             .launchIn(viewModelScope)
+    }
+
+    fun setCurrentSelectedNote(note: Note?) {
+        _currentSelectedNote.value = note
+    }
+
+    fun toggleDialogVisibility() {
+        _showDialog.value = !(showDialog.value ?: false)
+    }
+
+    fun deleteNote() {
+        viewModelScope.launch {
+            currentSelectedNote.value?.let { note ->
+                onEvent(NotesEvent.DeleteNote(note))
+                toggleDialogVisibility()
+                setCurrentSelectedNote(null)
+                SnackbarController.sendEvent(
+                    SnackbarEvent(
+                        message = "Note deleted",
+                        action = SnackbarAction(
+                            "Undo",
+                            action = { onEvent(NotesEvent.RestoreNote) }
+                        )
+                    )
+                )
+            }
+        }
     }
 }
