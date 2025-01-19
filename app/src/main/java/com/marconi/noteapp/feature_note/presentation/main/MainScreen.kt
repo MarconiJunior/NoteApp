@@ -1,12 +1,15 @@
 package com.marconi.noteapp.feature_note.presentation.main
 
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -21,18 +24,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.marconi.noteapp.events_utils.ObserveAsEvents
+import com.marconi.noteapp.events.CommonEvents
+import com.marconi.noteapp.events.utils.ObserveAsEvents
 import com.marconi.noteapp.feature_note.presentation.add_edit_note.AddEditNoteScreen
 import com.marconi.noteapp.feature_note.presentation.notes.NotesScreen
 import com.marconi.noteapp.feature_note.presentation.util.Screen
@@ -42,13 +49,19 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(
+    commonEvents: CommonEvents,
+    viewModel: MainViewModel = hiltViewModel()
+) {
+    val navController = rememberNavController()
     val inDarkMode by viewModel.inDarkMode.observeAsState()
     val snackbarHostState = remember {
         SnackbarHostState()
     }
+    val currentRoute = navController.currentBackStackEntryAsState()
 
     val scope = rememberCoroutineScope()
+
     ObserveAsEvents(
         flow = SnackbarController.events,
         snackbarHostState
@@ -67,10 +80,25 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
             }
         }
     }
+
+    ObserveAsEvents(
+        flow = commonEvents.events
+    ) { event ->
+        when (event) {
+            is CommonEvents.Event.SaveNote -> {
+                viewModel.setSaveNoteCallback(event.saveNote)
+            }
+        }
+    }
+
+    LaunchedEffect(currentRoute) {
+        Log.d("sadas","${currentRoute.value?.destination?.route}")
+    }
+
+
     NoteAppTheme(
         darkTheme =  inDarkMode ?: isSystemInDarkTheme()
     ) {
-        val navController = rememberNavController()
         Surface(
             color = MaterialTheme.colorScheme.surface
         ) {
@@ -78,11 +106,27 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            navController.navigate(Screen.AddEditNoteScreen.route)
+                            if (
+                                currentRoute.value?.destination?.route
+                                    ?.contains(Screen.AddEditNoteScreen.route) == false
+                            ) {
+                                navController.navigate(Screen.AddEditNoteScreen.route)
+                            } else {
+                                viewModel.saveNote()
+                            }
                         },
                         contentColor = MaterialTheme.colorScheme.primary
                     ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
+                        Icon(
+                            imageVector =
+                            if (
+                                currentRoute.value?.destination?.route
+                                    ?.contains(Screen.AddEditNoteScreen.route) == false
+                            ) {
+                                Icons.Default.Add
+                            } else Icons.Default.Save,
+                            contentDescription = "Add note"
+                        )
                     }
                 },
                 snackbarHost = {
@@ -116,7 +160,14 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 NavHost(
                     navController = navController,
                     startDestination = Screen.NotesScreen.route,
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(
+                        PaddingValues(
+                            top = paddingValues.calculateTopPadding(),
+                            bottom = paddingValues.calculateBottomPadding(),
+                            start = 16.dp,
+                            end = 16.dp
+                        )
+                    )
                 ) {
                     composable(route = Screen.NotesScreen.route) {
                         NotesScreen(navController = navController)

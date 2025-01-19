@@ -2,6 +2,7 @@ package com.marconi.noteapp.di
 
 import android.app.Application
 import androidx.room.Room
+import com.marconi.noteapp.events.CommonEvents
 import com.marconi.noteapp.feature_note.data.data_source.NoteDao
 import com.marconi.noteapp.feature_note.data.data_source.NoteDatabase
 import com.marconi.noteapp.feature_note.data.repository.NoteRepositoryImpl
@@ -47,4 +48,8 @@ object AppModule {
             getNote = GetNote(repository)
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideCommonEvents(): CommonEvents = CommonEvents()
 }

@@ -1,4 +1,4 @@
-package com.marconi.noteapp.events_utils
+package com.marconi.noteapp.events.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

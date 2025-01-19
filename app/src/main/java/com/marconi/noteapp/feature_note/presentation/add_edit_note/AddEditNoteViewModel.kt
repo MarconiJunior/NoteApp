@@ -6,9 +6,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.marconi.noteapp.events.CommonEvents
 import com.marconi.noteapp.feature_note.domain.model.InvalidNoteException
 import com.marconi.noteapp.feature_note.domain.model.Note
 import com.marconi.noteapp.feature_note.domain.use_case.NoteUseCases
+import com.marconi.noteapp.snackbar_utils.SnackbarController
+import com.marconi.noteapp.snackbar_utils.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
+    private val commonEvents: CommonEvents,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -42,6 +46,7 @@ class AddEditNoteViewModel @Inject constructor(
 
 
     init {
+        saveNote()
         savedStateHandle.get<Int>("noteId")?.let { noteId ->
             if(noteId != -1) {
                 viewModelScope.launch {
@@ -103,8 +108,8 @@ class AddEditNoteViewModel @Inject constructor(
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
                     } catch(e: InvalidNoteException) {
-                        _eventFlow.emit(
-                            UiEvent.ShowSnackbar(
+                        SnackbarController.sendEvent(
+                            SnackbarEvent(
                                 message = e.message ?: "Couldn't save note"
                             )
                         )
@@ -115,8 +120,14 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     sealed class UiEvent {
-        data class ShowSnackbar(val message: String): UiEvent()
-        object SaveNote: UiEvent()
+        data object SaveNote: UiEvent()
     }
 
+    fun saveNote() {
+        viewModelScope.launch {
+            commonEvents.emitEvent(CommonEvents.Event.SaveNote {
+                onEvent(AddEditNoteEvent.SaveNote)
+            })
+        }
+    }
 }
