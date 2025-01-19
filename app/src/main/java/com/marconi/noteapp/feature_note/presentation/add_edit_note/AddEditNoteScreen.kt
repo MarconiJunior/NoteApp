@@ -58,11 +58,11 @@ fun AddEditNoteScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(noteBackgroundAnimatable.value, RoundedCornerShape(10.dp))
+            .padding(10.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Note.noteColors.forEach { color ->
@@ -76,7 +76,7 @@ fun AddEditNoteScreen(
                         .border(
                             width = 3.dp,
                             color = if (viewModel.noteColor.value == colorInt) {
-                                Color.Black
+                                MaterialTheme.colorScheme.primary
                             } else Color.Transparent,
                             shape = CircleShape
                         )
