@@ -9,19 +9,31 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FormatPaint
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.godaddy.android.colorpicker.ClassicColorPicker
+import com.godaddy.android.colorpicker.HsvColor
+import com.godaddy.android.colorpicker.toColorInt
 import com.marconi.noteapp.feature_note.domain.model.Note
 import com.marconi.noteapp.feature_note.presentation.add_edit_note.components.TransparentHintTextField
 import kotlinx.coroutines.flow.collectLatest
@@ -36,6 +48,8 @@ fun AddEditNoteScreen(
 ) {
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
+    val selectedCustomColor by viewModel.selectedCustomColor.observeAsState()
+    val isDialogVisible by viewModel.isDialogVisible.observeAsState(false)
 
     val noteBackgroundAnimatable = remember {
         Animatable(
@@ -52,6 +66,29 @@ fun AddEditNoteScreen(
                 }
             }
         }
+    }
+
+    if (isDialogVisible) {
+        ColorPickerDialog(
+            onColorChanged = { color ->
+                color.toColorInt()?.let {
+                    scope.launch {
+                        noteBackgroundAnimatable.animateTo(
+                            targetValue = Color(it),
+                            animationSpec = tween(
+                                durationMillis = 500
+                            )
+                        )
+                    }
+                    viewModel.onEvent(AddEditNoteEvent.ChangeColor(it))
+                }
+                viewModel.setSelectedCustomColor(color)
+            },
+            onDismissRequest = {
+                viewModel.toggleDialogVisibility()
+            },
+            color = HsvColor.from(selectedCustomColor ?: Color(viewModel.noteColor.value))
+        )
     }
 
     Column(
@@ -93,6 +130,30 @@ fun AddEditNoteScreen(
                         }
                 )
             }
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .shadow(15.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(selectedCustomColor ?: MaterialTheme.colorScheme.surface)
+                    .border(
+                        width = 3.dp,
+                        color = if (viewModel.noteColor.value == selectedCustomColor?.toArgb()) {
+                            MaterialTheme.colorScheme.primary
+                        } else Color.Transparent,
+                        shape = CircleShape
+                    )
+                    .clickable {
+                        viewModel.toggleDialogVisibility()
+                    }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.FormatPaint,
+                    contentDescription = "Select Color",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         TransparentHintTextField(
@@ -122,5 +183,40 @@ fun AddEditNoteScreen(
             textStyle = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxHeight()
         )
+    }
+}
+
+@Composable
+fun ColorPickerDialog(
+    onColorChanged: (HsvColor) -> Unit,
+    onDismissRequest: () -> Unit,
+    color: HsvColor
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .size(300.dp, 400.dp)
+                .background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Text(
+                text = "Select Color",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            ClassicColorPicker(
+                modifier = Modifier.size(300.dp),
+                color = color,
+                onColorChanged = onColorChanged
+            )
+        }
     }
 }

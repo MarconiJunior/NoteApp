@@ -2,10 +2,14 @@ package com.marconi.noteapp.feature_note.presentation.add_edit_note
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godaddy.android.colorpicker.HsvColor
 import com.marconi.noteapp.events.CommonEvents
 import com.marconi.noteapp.feature_note.domain.model.InvalidNoteException
 import com.marconi.noteapp.feature_note.domain.model.Note
@@ -35,6 +39,12 @@ class AddEditNoteViewModel @Inject constructor(
         hint = "Enter some content"
     ))
     val noteContent: State<NoteTextFieldState> = _noteContent
+
+    private val _selectedCustomColor = MutableLiveData<Color?>(null)
+    val selectedCustomColor: LiveData<Color?> = _selectedCustomColor
+
+    private val _isDialogVisible = MutableLiveData(false)
+    val isDialogVisible: LiveData<Boolean> = _isDialogVisible
 
     private val _noteColor = mutableStateOf(Note.noteColors.random().toArgb())
     val noteColor: State<Int> = _noteColor
@@ -129,5 +139,13 @@ class AddEditNoteViewModel @Inject constructor(
                 onEvent(AddEditNoteEvent.SaveNote)
             })
         }
+    }
+
+    fun setSelectedCustomColor(hsvColor: HsvColor) {
+        _selectedCustomColor.value = hsvColor.toColor()
+    }
+
+    fun toggleDialogVisibility() {
+        _isDialogVisible.value = !(isDialogVisible.value ?: false)
     }
 }
