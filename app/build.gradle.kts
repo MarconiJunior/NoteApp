@@ -61,6 +61,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.6")
     val composeVersion = "1.7.6"
 
     implementation("androidx.core:core-ktx:1.15.0")
