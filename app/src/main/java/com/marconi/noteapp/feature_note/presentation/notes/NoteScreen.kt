@@ -1,6 +1,5 @@
 package com.marconi.noteapp.feature_note.presentation.notes
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -18,10 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,14 +30,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.marconi.noteapp.R
 import com.marconi.noteapp.feature_note.presentation.notes.components.NoteItem
 import com.marconi.noteapp.feature_note.presentation.notes.components.OrderSection
 import com.marconi.noteapp.feature_note.presentation.util.Screen
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun NotesScreen(
     navController: NavController,
@@ -60,7 +60,7 @@ fun NotesScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Your note",
+                text = stringResource(R.string.your_note),
                 style = MaterialTheme.typography.titleSmall
             )
             IconButton(
@@ -98,7 +98,7 @@ fun NotesScreen(
                         .clickable {
                             navController.navigate(
                                 Screen.AddEditNoteScreen.route +
-                                    "?noteId=${note.id}&noteColor=${note.color}"
+                                        "?noteId=${note.id}&noteColor=${note.color}"
                             )
                         },
                     onDeleteClick = {
@@ -122,22 +122,22 @@ fun DeleteConfirmDialog(viewModel: NotesViewModel = hiltViewModel()) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Delete note")
+                Text(text = stringResource(R.string.delete_note))
                 Icon(
                     imageVector = Icons.Default.DeleteForever,
-                    contentDescription = "Delete note"
+                    contentDescription = stringResource(R.string.delete_note)
                 )
             }
         },
-        text = { Text(text = "Are you sure you want to delete this note?") },
+        text = { Text(text = stringResource(R.string.note_delete_confirmation_question)) },
         confirmButton = {
             IconButton(onClick = viewModel::deleteNote) {
-                Text(text = "Yes")
+                Text(text = stringResource(R.string.note_delete_confirmation_yes))
             }
         },
         dismissButton = {
             IconButton(onClick = viewModel::toggleDialogVisibility) {
-                Text(text = "No")
+                Text(text = stringResource(R.string.note_delete_confirmation_no))
             }
         },
         shape = RoundedCornerShape(10.dp),

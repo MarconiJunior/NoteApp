@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -34,6 +35,7 @@ import androidx.navigation.NavController
 import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
 import com.godaddy.android.colorpicker.toColorInt
+import com.marconi.noteapp.R
 import com.marconi.noteapp.feature_note.domain.model.Note
 import com.marconi.noteapp.feature_note.presentation.add_edit_note.components.TransparentHintTextField
 import kotlinx.coroutines.flow.collectLatest
@@ -71,7 +73,7 @@ fun AddEditNoteScreen(
     if (isDialogVisible) {
         ColorPickerDialog(
             onColorChanged = { color ->
-                color.toColorInt()?.let {
+                color.toColorInt().let {
                     scope.launch {
                         noteBackgroundAnimatable.animateTo(
                             targetValue = Color(it),
@@ -149,7 +151,7 @@ fun AddEditNoteScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.FormatPaint,
-                    contentDescription = "Select Color",
+                    contentDescription = stringResource(R.string.select_color),
                     modifier = Modifier
                         .align(Alignment.Center)
                 )
@@ -158,7 +160,7 @@ fun AddEditNoteScreen(
         Spacer(modifier = Modifier.height(16.dp))
         TransparentHintTextField(
             text = titleState.text,
-            hint = titleState.hint,
+            hint = titleState.hint?.let { stringResource(it) } ?: "",
             onValueChange = {
                 viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
             },
@@ -172,7 +174,7 @@ fun AddEditNoteScreen(
         Spacer(modifier = Modifier.height(16.dp))
         TransparentHintTextField(
             text = contentState.text,
-            hint = contentState.hint,
+            hint = contentState.hint?.let { stringResource(it) } ?: "",
             onValueChange = {
                 viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
             },
@@ -207,7 +209,7 @@ fun ColorPickerDialog(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = "Select Color",
+                text = stringResource(R.string.select_color),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )

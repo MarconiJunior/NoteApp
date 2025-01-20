@@ -10,6 +10,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godaddy.android.colorpicker.HsvColor
+import com.marconi.noteapp.R
 import com.marconi.noteapp.events.CommonEvents
 import com.marconi.noteapp.feature_note.domain.model.InvalidNoteException
 import com.marconi.noteapp.feature_note.domain.model.Note
@@ -31,12 +32,12 @@ class AddEditNoteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _noteTitle = mutableStateOf(NoteTextFieldState(
-        hint = "Enter title..."
+        hint = R.string.enter_title
     ))
     val noteTitle: State<NoteTextFieldState> = _noteTitle
 
     private val _noteContent = mutableStateOf(NoteTextFieldState(
-        hint = "Enter some content"
+        hint = R.string.enter_some_content
     ))
     val noteContent: State<NoteTextFieldState> = _noteContent
 
@@ -120,7 +121,7 @@ class AddEditNoteViewModel @Inject constructor(
                     } catch(e: InvalidNoteException) {
                         SnackbarController.sendEvent(
                             SnackbarEvent(
-                                message = e.message ?: "Couldn't save note"
+                                message = e.message ?: R.string.couldn_t_save_note
                             )
                         )
                     }
@@ -133,7 +134,7 @@ class AddEditNoteViewModel @Inject constructor(
         data object SaveNote: UiEvent()
     }
 
-    fun saveNote() {
+    private fun saveNote() {
         viewModelScope.launch {
             commonEvents.emitEvent(CommonEvents.Event.SaveNote {
                 onEvent(AddEditNoteEvent.SaveNote)

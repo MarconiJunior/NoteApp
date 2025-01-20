@@ -4,7 +4,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
 data class SnackbarEvent(
-    val message: String,
+    val message: Any,
     val action: SnackbarAction? = null
 )
 

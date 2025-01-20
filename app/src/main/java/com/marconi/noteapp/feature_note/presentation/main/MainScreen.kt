@@ -1,6 +1,5 @@
 package com.marconi.noteapp.feature_note.presentation.main
 
-import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,12 +24,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -39,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.marconi.noteapp.R
 import com.marconi.noteapp.events.CommonEvents
 import com.marconi.noteapp.events.utils.ObserveAsEvents
 import com.marconi.noteapp.feature_note.presentation.add_edit_note.AddEditNoteScreen
@@ -52,35 +52,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     commonEvents: CommonEvents,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: MainViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState
 ) {
     val navController = rememberNavController()
     val inDarkMode by viewModel.inDarkMode.observeAsState()
-    val snackbarHostState = remember {
-        SnackbarHostState()
-    }
     val currentRoute = navController.currentBackStackEntryAsState()
-
-    val scope = rememberCoroutineScope()
-
-    ObserveAsEvents(
-        flow = SnackbarController.events,
-        snackbarHostState
-    ) { event ->
-        scope.launch {
-            snackbarHostState.currentSnackbarData?.dismiss()
-
-            val result = snackbarHostState.showSnackbar(
-                message = event.message,
-                actionLabel = event.action?.name,
-                duration = SnackbarDuration.Long
-            )
-
-            if(result == SnackbarResult.ActionPerformed) {
-                event.action?.action?.invoke()
-            }
-        }
-    }
 
     ObserveAsEvents(
         flow = commonEvents.events
@@ -125,7 +102,7 @@ fun MainScreen(
                             ) {
                                 Icons.Default.Add
                             } else Icons.Default.Save,
-                            contentDescription = "Add note"
+                            contentDescription = stringResource(R.string.add_note)
                         )
                     }
                 },
@@ -135,26 +112,33 @@ fun MainScreen(
                 topBar = {
                     TopAppBar(
                         title = {
-                            Text(text = "Notes")
+                            Text(text = stringResource(R.string.notes))
                         },
                         actions = {
                             IconButton(onClick = viewModel::toggleDarkMode) {
                                 Crossfade(inDarkMode) { isDark ->
-                                    if (isDark == true) {
-                                        Icon(
-                                            imageVector = Icons.Default.DarkMode,
-                                            contentDescription = "Dark Mode"
-                                        )
-                                    } else if (isDark == false) {
-                                        Icon(
-                                            imageVector = Icons.Default.LightMode,
-                                            contentDescription = "Light Mode"
-                                        )
-                                    } else {
-                                        Icon(
-                                            imageVector = Icons.Default.Settings,
-                                            contentDescription = "System default"
-                                        )
+                                    when (isDark) {
+                                        true -> {
+                                            Icon(
+                                                imageVector = Icons.Default.DarkMode,
+                                                contentDescription =
+                                                    stringResource(R.string.dark_mode)
+                                            )
+                                        }
+                                        false -> {
+                                            Icon(
+                                                imageVector = Icons.Default.LightMode,
+                                                contentDescription =
+                                                    stringResource(R.string.light_mode)
+                                            )
+                                        }
+                                        else -> {
+                                            Icon(
+                                                imageVector = Icons.Default.Settings,
+                                                contentDescription =
+                                                    stringResource(R.string.system_default)
+                                            )
+                                        }
                                     }
                                 }
                             }

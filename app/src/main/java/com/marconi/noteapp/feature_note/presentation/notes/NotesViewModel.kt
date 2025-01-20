@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.marconi.noteapp.R
 import com.marconi.noteapp.feature_note.domain.model.Note
 import com.marconi.noteapp.feature_note.domain.use_case.NoteUseCases
 import com.marconi.noteapp.feature_note.domain.util.NoteOrder
@@ -99,7 +100,7 @@ class NotesViewModel @Inject constructor(
                 setCurrentSelectedNote(null)
                 SnackbarController.sendEvent(
                     SnackbarEvent(
-                        message = "Note deleted",
+                        message = R.string.note_deleted,
                         action = SnackbarAction(
                             "Undo",
                             action = { onEvent(NotesEvent.RestoreNote) }
