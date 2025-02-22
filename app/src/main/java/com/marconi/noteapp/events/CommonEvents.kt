@@ -1,6 +1,6 @@
 package com.marconi.noteapp.events
 
-import com.marconi.noteapp.feature_note.domain.model.Note
+import com.marconi.noteapp.domain.model.Note
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
