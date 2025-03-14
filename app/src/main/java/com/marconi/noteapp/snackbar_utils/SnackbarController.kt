@@ -2,6 +2,7 @@ package com.marconi.noteapp.snackbar_utils
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import javax.inject.Inject
 
 data class SnackbarEvent(
     val message: Any,
@@ -13,7 +14,7 @@ data class SnackbarAction(
     val action: suspend () -> Unit
 )
 
-object SnackbarController {
+class SnackbarController @Inject constructor() {
     private val _events = Channel<SnackbarEvent>()
     val events = _events.receiveAsFlow()
 

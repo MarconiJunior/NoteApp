@@ -19,12 +19,13 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var commonEvents: CommonEvents
+    @Inject lateinit var snackbarController: SnackbarController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val snackbarHostState = remember { SnackbarHostState() }
             ObserveAsEvents(
-                flow = SnackbarController.events,
+                flow = snackbarController.events,
                 snackbarHostState
             ) { event ->
                 lifecycleScope.launch {

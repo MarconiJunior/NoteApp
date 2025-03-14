@@ -14,6 +14,7 @@ import com.marconi.noteapp.domain.use_case.GetNote
 import com.marconi.noteapp.domain.use_case.GetNotes
 import com.marconi.noteapp.domain.use_case.NoteUseCases
 import com.marconi.noteapp.presentation.util.ThemeManager
+import com.marconi.noteapp.snackbar_utils.SnackbarController
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,4 +62,8 @@ object AppModule {
     fun provideThemeManager(
         @ApplicationContext context: Context
     ) = ThemeManager(context)
+
+    @Provides
+    @Singleton
+    fun provideSnackbarController() = SnackbarController()
 }

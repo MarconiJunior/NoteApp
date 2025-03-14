@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val themeManager: ThemeManager
+    private val themeManager: ThemeManager,
+    private val snackbarController: SnackbarController
 ) : ViewModel() {
     private val _inDarkMode: MutableLiveData<Boolean?> =
         MutableLiveData(themeManager.getSavedTheme())
@@ -39,7 +40,7 @@ class MainViewModel @Inject constructor(
     fun saveNote() {
         viewModelScope.launch {
             if (saveNoteCallback.value == null) {
-                SnackbarController.sendEvent(
+                snackbarController.sendEvent(
                     SnackbarEvent(
                         message = "Save note callback is null"
                     )

@@ -22,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val noteUseCases: NoteUseCases
+    private val noteUseCases: NoteUseCases,
+    private val snackbarController: SnackbarController
 ) : ViewModel() {
     private val _state = mutableStateOf(NotesState())
     val state: State<NotesState> = _state
@@ -98,7 +99,7 @@ class NotesViewModel @Inject constructor(
                 onEvent(NotesEvent.DeleteNote(note))
                 toggleDialogVisibility()
                 setCurrentSelectedNote(null)
-                SnackbarController.sendEvent(
+                snackbarController.sendEvent(
                     SnackbarEvent(
                         message = R.string.note_deleted,
                         action = SnackbarAction(

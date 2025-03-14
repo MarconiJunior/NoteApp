@@ -28,6 +28,7 @@ import javax.inject.Inject
 class AddEditNoteViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     private val commonEvents: CommonEvents,
+    private val snackbarController: SnackbarController,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -123,11 +124,7 @@ class AddEditNoteViewModel @Inject constructor(
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
                     } catch(e: InvalidNoteException) {
-                        SnackbarController.sendEvent(
-                            SnackbarEvent(
-                                message = e.message ?: R.string.couldn_t_save_note
-                            )
-                        )
+                        emmitSnackbar(e.message)
                     }
                 }
             }
@@ -144,6 +141,14 @@ class AddEditNoteViewModel @Inject constructor(
                 onEvent(AddEditNoteEvent.SaveNote)
             })
         }
+    }
+
+    private suspend fun emmitSnackbar(message: String?) {
+        snackbarController.sendEvent(
+            SnackbarEvent(
+                message = message ?: R.string.couldn_t_save_note
+            )
+        )
     }
 
     fun setSelectedCustomColor(hsvColor: HsvColor) {
