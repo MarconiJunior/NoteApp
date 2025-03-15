@@ -6,16 +6,18 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.49" apply false
     id("com.google.devtools.ksp") version "2.1.0-1.0.29" apply false
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0" apply false
+    id("org.jlleitschuh.gradle.ktlint") version "12.2.0" apply false
+    id("io.gitlab.arturbosch.detekt") version "1.23.6" apply false
 }
 
 buildscript {
     repositories {
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
+        mavenCentral()
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
         classpath("com.google.dagger:hilt-android-gradle-plugin:2.55")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:12.2.0")
+        classpath("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.6")
     }
 }
