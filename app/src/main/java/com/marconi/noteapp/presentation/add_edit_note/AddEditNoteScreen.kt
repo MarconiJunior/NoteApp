@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FormatPaint
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +53,10 @@ fun AddEditNoteScreen(
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
     val selectedCustomColor by viewModel.selectedCustomColor.observeAsState()
-    val isDialogVisible by viewModel.isDialogVisible.observeAsState(false)
+    val fontSize by viewModel.fontSize.observeAsState(16f)
+    val textColor by viewModel.textColor.observeAsState(Color.Black.toArgb())
+    val isDialogVisible by viewModel.isColorDialogVisible.observeAsState(false)
+    val isTextDialogVisible by viewModel.isFontDialogVisible.observeAsState(false)
 
     val noteBackgroundAnimatable = remember {
         Animatable(
@@ -87,9 +92,23 @@ fun AddEditNoteScreen(
                 viewModel.setSelectedCustomColor(color)
             },
             onDismissRequest = {
-                viewModel.toggleDialogVisibility()
+                viewModel.toggleColorDialogVisibility()
             },
             color = HsvColor.from(selectedCustomColor ?: Color(viewModel.noteColor.value))
+        )
+    }
+
+    if (isTextDialogVisible) {
+        TextSettingsDialog(
+            onDismissRequest = viewModel::toggleFontDialogVisibility,
+            initialFontColor = Color(textColor),
+            initialFontSize = fontSize,
+            onFontSizeChange = {
+                viewModel.onEvent(AddEditNoteEvent.ChangeFontSize(it))
+            },
+            onFontColorChange = {
+                viewModel.onEvent(AddEditNoteEvent.ChangeTextColor(it.toArgb()))
+            }
         )
     }
 
@@ -106,51 +125,48 @@ fun AddEditNoteScreen(
         ) {
             Note.noteColors.forEach { color ->
                 val colorInt = color.toArgb()
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .shadow(15.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(color)
-                        .border(
-                            width = 3.dp,
-                            color = if (viewModel.noteColor.value == colorInt) {
-                                MaterialTheme.colorScheme.primary
-                            } else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .clickable {
-                            scope.launch {
-                                noteBackgroundAnimatable.animateTo(
-                                    targetValue = Color(colorInt),
-                                    animationSpec = tween(
-                                        durationMillis = 500
-                                    )
+                ColorCircle(
+                    color,
+                    borderColor = if (viewModel.noteColor.value == colorInt) {
+                        MaterialTheme.colorScheme.primary
+                    } else Color.Transparent,
+                    onClick = {
+                        scope.launch {
+                            noteBackgroundAnimatable.animateTo(
+                                targetValue = Color(colorInt),
+                                animationSpec = tween(
+                                    durationMillis = 500
                                 )
-                            }
-                            viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
+                            )
                         }
+                        viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
+                    }
                 )
             }
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .shadow(15.dp, CircleShape)
-                    .clip(CircleShape)
-                    .background(selectedCustomColor ?: MaterialTheme.colorScheme.surface)
-                    .border(
-                        width = 3.dp,
-                        color = if (viewModel.noteColor.value == selectedCustomColor?.toArgb()) {
-                            MaterialTheme.colorScheme.primary
-                        } else Color.Transparent,
-                        shape = CircleShape
+            ColorCircle(
+                selectedCustomColor ?: MaterialTheme.colorScheme.surface,
+                borderColor = if (viewModel.noteColor.value == selectedCustomColor?.toArgb()) {
+                    MaterialTheme.colorScheme.primary
+                } else Color.Transparent,
+                onClick = viewModel::toggleColorDialogVisibility,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Filled.FormatPaint,
+                        contentDescription = stringResource(R.string.select_color),
+                        modifier = Modifier
+                            .align(Alignment.Center)
                     )
-                    .clickable {
-                        viewModel.toggleDialogVisibility()
-                    }
+                }
+            )
+            ColorCircle(
+                MaterialTheme.colorScheme.surface,
+                borderColor = if (viewModel.noteColor.value == selectedCustomColor?.toArgb()) {
+                    MaterialTheme.colorScheme.primary
+                } else Color.Transparent,
+                onClick = viewModel::toggleFontDialogVisibility,
             ) {
                 Icon(
-                    imageVector = Icons.Filled.FormatPaint,
+                    imageVector = Icons.Filled.TextFields,
                     contentDescription = stringResource(R.string.select_color),
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -185,6 +201,89 @@ fun AddEditNoteScreen(
             textStyle = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxHeight()
         )
+    }
+}
+
+@Composable
+fun TextSettingsDialog(
+    onDismissRequest: () -> Unit,
+    onFontSizeChange: (Float) -> Unit,
+    onFontColorChange: (Color) -> Unit,
+    initialFontSize: Float,
+    initialFontColor: Color
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Text(
+                text = "Text Settings",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "Font Size",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Slider(
+                value = initialFontSize,
+                onValueChange = onFontSizeChange,
+                valueRange = 12f..36f,
+                steps = 24,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "Font Color",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            ClassicColorPicker(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                color = HsvColor.from(initialFontColor),
+                onColorChanged = { hsvColor ->
+                    onFontColorChange(hsvColor.toColor())
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ColorCircle(
+    color: Color,
+    borderColor: Color,
+    onClick: () -> Unit,
+    icon: (@Composable BoxScope.() -> Unit)? = null
+) {
+    Box(
+        modifier = Modifier
+            .size(50.dp)
+            .shadow(15.dp, CircleShape)
+            .clip(CircleShape)
+            .background(color)
+            .border(
+                width = 3.dp,
+                color = borderColor,
+                shape = CircleShape
+            )
+            .clickable { onClick() }
+    ) {
+        icon?.invoke(this)
     }
 }
 

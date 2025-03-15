@@ -49,11 +49,20 @@ class AddEditNoteViewModel @Inject constructor(
     private val _selectedCustomColor = MutableLiveData<Color?>(null)
     val selectedCustomColor: LiveData<Color?> = _selectedCustomColor
 
-    private val _isDialogVisible = MutableLiveData(false)
-    val isDialogVisible: LiveData<Boolean> = _isDialogVisible
+    private val _isColorDialogVisible = MutableLiveData(false)
+    val isColorDialogVisible: LiveData<Boolean> = _isColorDialogVisible
+
+    private val _isFontDialogVisible = MutableLiveData(false)
+    val isFontDialogVisible: LiveData<Boolean> = _isFontDialogVisible
 
     private val _noteColor = mutableStateOf(Note.noteColors.random().toArgb())
     val noteColor: State<Int> = _noteColor
+
+    private val _fontSize = MutableLiveData(16f)
+    val fontSize: LiveData<Float> = _fontSize
+
+    private val _textColor = MutableLiveData(Color.Black.toArgb())
+    val textColor: LiveData<Int> = _textColor
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow: SharedFlow<UiEvent> = _eventFlow.asSharedFlow()
@@ -76,7 +85,9 @@ class AddEditNoteViewModel @Inject constructor(
                             text = note.content,
                             isHintVisible = false
                         )
-                        _noteColor.value = note.color
+                        onEvent(AddEditNoteEvent.ChangeColor(note.color))
+                        onEvent(AddEditNoteEvent.ChangeFontSize(note.fontSize))
+                        onEvent(AddEditNoteEvent.ChangeTextColor(note.textColor))
                     }
                 }
             }
@@ -110,6 +121,12 @@ class AddEditNoteViewModel @Inject constructor(
             is AddEditNoteEvent.ChangeColor -> {
                 _noteColor.value = event.color
             }
+            is AddEditNoteEvent.ChangeFontSize -> {
+                _fontSize.value = event.fontSize
+            }
+            is AddEditNoteEvent.ChangeTextColor -> {
+                _textColor.value = event.textColor
+            }
             is AddEditNoteEvent.SaveNote -> {
                 viewModelScope.launch {
                     try {
@@ -119,6 +136,8 @@ class AddEditNoteViewModel @Inject constructor(
                                 content = noteContent.value.text,
                                 timestamp = System.currentTimeMillis(),
                                 color = noteColor.value,
+                                textColor = textColor.value ?: Color.Black.toArgb(),
+                                fontSize = fontSize.value ?: 16f,
                                 id = currentNoteId
                             )
                         )
@@ -155,7 +174,11 @@ class AddEditNoteViewModel @Inject constructor(
         _selectedCustomColor.value = hsvColor.toColor()
     }
 
-    fun toggleDialogVisibility() {
-        _isDialogVisible.value = !(isDialogVisible.value ?: false)
+    fun toggleColorDialogVisibility() {
+        _isColorDialogVisible.value = !(isColorDialogVisible.value ?: false)
+    }
+
+    fun toggleFontDialogVisibility() {
+        _isFontDialogVisible.value = !(isFontDialogVisible.value ?: false)
     }
 }
