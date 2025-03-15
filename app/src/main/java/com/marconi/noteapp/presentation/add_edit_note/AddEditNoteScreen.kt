@@ -29,7 +29,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -144,32 +147,30 @@ fun AddEditNoteScreen(
                 )
             }
             ColorCircle(
-                selectedCustomColor ?: MaterialTheme.colorScheme.surface,
-                borderColor = if (viewModel.noteColor.value == selectedCustomColor?.toArgb()) {
-                    MaterialTheme.colorScheme.primary
-                } else Color.Transparent,
+                selectedCustomColor ?: MaterialTheme.colorScheme.primary,
+                borderColor = MaterialTheme.colorScheme.inversePrimary,
                 onClick = viewModel::toggleColorDialogVisibility,
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.FormatPaint,
                         contentDescription = stringResource(R.string.select_color),
                         modifier = Modifier
-                            .align(Alignment.Center)
+                            .align(Alignment.Center),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             )
             ColorCircle(
-                MaterialTheme.colorScheme.surface,
-                borderColor = if (viewModel.noteColor.value == selectedCustomColor?.toArgb()) {
-                    MaterialTheme.colorScheme.primary
-                } else Color.Transparent,
+                MaterialTheme.colorScheme.primary,
+                borderColor = MaterialTheme.colorScheme.inversePrimary,
                 onClick = viewModel::toggleFontDialogVisibility,
             ) {
                 Icon(
                     imageVector = Icons.Filled.TextFields,
                     contentDescription = stringResource(R.string.select_color),
                     modifier = Modifier
-                        .align(Alignment.Center)
+                        .align(Alignment.Center),
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
@@ -185,7 +186,11 @@ fun AddEditNoteScreen(
             },
             isHintVisible = titleState.isHintVisible,
             singleLine = true,
-            textStyle = MaterialTheme.typography.titleMedium
+            textStyle = TextStyle(
+                fontSize = fontSize.sp,
+                color = Color(textColor),
+                fontWeight = FontWeight.Bold
+            )
         )
         Spacer(modifier = Modifier.height(16.dp))
         TransparentHintTextField(
@@ -198,7 +203,12 @@ fun AddEditNoteScreen(
                 viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
             },
             isHintVisible = contentState.isHintVisible,
-            textStyle = MaterialTheme.typography.bodyMedium,
+            textStyle = TextStyle(
+                fontSize = fontSize.sp,
+                color = Color(textColor),
+                fontWeight = FontWeight.Normal,
+
+            ),
             modifier = Modifier.fillMaxHeight()
         )
     }
@@ -218,7 +228,8 @@ fun TextSettingsDialog(
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background, RoundedCornerShape(10.dp))
+                .padding(16.dp)
         ) {
             Text(
                 text = "Text Settings",
@@ -303,7 +314,9 @@ fun ColorPickerDialog(
         Column(
             modifier = Modifier
                 .size(300.dp, 400.dp)
-                .background(MaterialTheme.colorScheme.background),
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.background, RoundedCornerShape(10.dp))
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {

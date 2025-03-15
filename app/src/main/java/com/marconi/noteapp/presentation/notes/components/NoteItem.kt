@@ -23,9 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.ColorUtils
 import com.marconi.noteapp.R
 import com.marconi.noteapp.domain.model.Note
@@ -76,16 +79,22 @@ fun NoteItem(
         ) {
             Text(
                 text = note.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = TextStyle(
+                    fontSize = note.fontSize.sp,
+                    color = Color(note.textColor),
+                    fontWeight = FontWeight.Bold
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = note.content,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = TextStyle(
+                    fontSize = note.fontSize.sp,
+                    color = Color(note.textColor),
+                    fontWeight = FontWeight.Normal
+                ),
                 maxLines = 10,
                 overflow = TextOverflow.Ellipsis
             )

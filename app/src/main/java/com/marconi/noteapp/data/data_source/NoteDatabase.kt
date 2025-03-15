@@ -19,8 +19,8 @@ abstract class NoteDatabase: RoomDatabase() {
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE notes ADD COLUMN textColor INTEGER NOT NULL DEFAULT 0")
-                db.execSQL("ALTER TABLE notes ADD COLUMN fontSize REAL NOT NULL DEFAULT 16.0")
+                db.execSQL("ALTER TABLE note ADD COLUMN textColor INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE note ADD COLUMN fontSize REAL NOT NULL DEFAULT 16.0")
             }
         }
     }
