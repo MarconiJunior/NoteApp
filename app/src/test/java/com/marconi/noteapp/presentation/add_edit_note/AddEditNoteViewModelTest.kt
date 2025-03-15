@@ -92,6 +92,8 @@ class AddEditNoteViewModelTest {
             title = "Test Title",
             content = "Test Content",
             color = Color.Green.toArgb(),
+            textColor = Color.Black.toArgb(),
+            fontSize = 10f,
             timestamp = System.currentTimeMillis()
         )
 
