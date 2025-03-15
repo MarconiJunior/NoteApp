@@ -15,10 +15,12 @@ data class Note(
     val content: String,
     val timestamp: Long,
     val color: Int,
+    val textColor: Int,
+    val fontSize: Float,
     @PrimaryKey val id: Int? = null
 ) {
     companion object {
-        val noteColors = listOf(RedOrange, Violet, BabyBlue, RedPink)
+        val noteColors = listOf(Violet, BabyBlue, RedPink)
     }
 }
 
